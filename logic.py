@@ -1,40 +1,35 @@
 import csv
 from models import Student
 
-FILE_NAME = "students.csv"
+FILE = "students.csv"
 
 def load_students():
     students = {}
     try:
-        with open(FILE_NAME, "r") as file:
-            reader = csv.DictReader(file)
-            for row in reader:
-                marks = {
-                    "Maths": int(row["Maths"]),
-                    "Science": int(row["Science"]),
-                    "English": int(row["English"])
-                }
-                students[row["Name"]] = Student(row["Name"], marks)
-    except FileNotFoundError:
+        with open(FILE, "r") as f:
+            reader = csv.DictReader(f)
+            for r in reader:
+                marks = {k: int(r[k]) for k in ["Maths", "Science", "English"]}
+                students[r["Name"]] = Student(r["Name"], marks)
+    except:
         pass
     return students
 
 def save_student(name, marks):
-    with open(FILE_NAME, "a", newline="") as file:
-        writer = csv.writer(file)
-        writer.writerow([name, marks["Maths"], marks["Science"], marks["English"]])
+    try:
+        open(FILE, "r")
+        file_exists = True
+    except:
+        file_exists = False
 
-def class_average(students):
-    return sum(s.average() for s in students.values()) / len(students)
+    with open(FILE, "a", newline="") as f:
+        writer = csv.writer(f)
+        if not file_exists:
+            writer.writerow(["Name", "Maths", "Science", "English"])
+        writer.writerow([name, marks["Maths"], marks["Science"], marks["English"]])
 
 def subject_average(students, subject):
     return sum(s.marks[subject] for s in students.values()) / len(students)
-
-def topper(students):
-    return max(students.values(), key=lambda s: s.average())
-
-def weak_students(students):
-    return [s.name for s in students.values() if s.average() < 40]
 
 def result_summary(students):
     pass_count = sum(1 for s in students.values() if s.average() >= 40)
