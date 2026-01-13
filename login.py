@@ -1,40 +1,30 @@
 import tkinter as tk
-from tkinter import messagebox
-import admin_ui
-import student_ui
+from admin_ui import admin_login
+from student_ui import student_login
 
-def open_admin_login():
-    admin_ui.admin_login()
-
-def open_student_login():
-    student_ui.student_login()
+def center_window(win, width, height):
+    # Center window on the screen
+    screen_width = win.winfo_screenwidth()
+    screen_height = win.winfo_screenheight()
+    x = (screen_width // 2) - (width // 2)
+    y = (screen_height // 2) - (height // 2)
+    win.geometry(f"{width}x{height}+{x}+{y}")
 
 def login_home():
     root = tk.Tk()
-    root.title("EduTrack Login")
-    root.geometry("400x300")
-    root.resizable(False, False)
+    root.title("EduTrack – Login")
+    root.configure(bg="#e6f0ff")
 
-    tk.Label(
-        root,
-        text="EduTrack – Student Performance System",
-        font=("Arial", 14, "bold")
-    ).pack(pady=30)
+    # Main screen maximizable
+    root.state("zoomed")
 
-    tk.Button(
-        root,
-        text="Admin Login",
-        width=20,
-        height=2,
-        command=open_admin_login
-    ).pack(pady=10)
+    tk.Label(root, text="EduTrack", font=("Arial", 28, "bold"), bg="#e6f0ff", fg="#003366").pack(pady=30)
+    tk.Label(root, text="Student Performance Management System", font=("Arial", 16), bg="#e6f0ff", fg="#003366").pack(pady=10)
 
-    tk.Button(
-        root,
-        text="Student Login",
-        width=20,
-        height=2,
-        command=open_student_login
-    ).pack(pady=10)
+    tk.Button(root, text="Admin Login", width=25, height=2, bg="#3366cc", fg="white", font=("Arial", 14, "bold"),
+              command=admin_login).pack(pady=30)
+    
+    tk.Button(root, text="Student Login", width=25, height=2, bg="#339966", fg="white", font=("Arial", 14, "bold"),
+              command=student_login).pack(pady=20)
 
     root.mainloop()
