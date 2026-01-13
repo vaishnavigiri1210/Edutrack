@@ -1,117 +1,163 @@
 import tkinter as tk
 from tkinter import messagebox, ttk
 import logic
-from tkinter import scrolledtext
+import matplotlib.pyplot as plt
 
-def center_window(win, width, height):
-    screen_width = win.winfo_screenwidth()
-    screen_height = win.winfo_screenheight()
-    x = (screen_width // 2) - (width // 2)
-    y = (screen_height // 2) - (height // 2)
-    win.geometry(f"{width}x{height}+{x}+{y}")
+BG = "#f4f6f9"
+PRIMARY = "#1f3c88"     # blue buttons
+SECONDARY = "#4caf50"   # green buttons
+LOGOUT = "#e53935"      # red only for logout
+
 
 # ---------- ADMIN LOGIN ----------
-def admin_login():
-    login_window = tk.Tk()
-    login_window.title("Admin Login - EduTrack")
-    login_window.configure(bg="#f0f8ff")
-    login_window.resizable(False, False)
-    center_window(login_window, 400, 300)
+def admin_login(parent):
+    win = tk.Toplevel(parent)
+    win.title("Admin Login")
+    win.geometry("400x300")
+    win.configure(bg=BG)
 
-    tk.Label(login_window, text="Admin Login", font=("Arial", 18, "bold"), bg="#f0f8ff").pack(pady=20)
-    tk.Label(login_window, text="Username", bg="#f0f8ff").pack()
-    username = tk.Entry(login_window)
-    username.pack(pady=5)
-    tk.Label(login_window, text="Password", bg="#f0f8ff").pack()
-    password = tk.Entry(login_window, show="*")
-    password.pack(pady=5)
+    tk.Label(
+        win, text="Admin Login",
+        font=("Arial", 18, "bold"),
+        bg=BG
+    ).pack(pady=20)
+
+    tk.Label(win, text="Username", bg=BG).pack()
+    user = tk.Entry(win, width=25)
+    user.pack(pady=5)
+
+    tk.Label(win, text="Password", bg=BG).pack()
+    pwd = tk.Entry(win, show="*", width=25)
+    pwd.pack(pady=5)
 
     def verify():
-        if username.get() == "admin" and password.get() == "admin123":
-            login_window.destroy()
-            admin_dashboard()
+        if user.get() == "admin" and pwd.get() == "admin123":
+            win.destroy()
+            admin_dashboard(parent)
         else:
-            messagebox.showerror("Error", "Invalid credentials")
+            messagebox.showerror("Error", "Invalid Credentials")
 
-    tk.Button(login_window, text="Login", width=20, height=2, bg="#339966", fg="white", font=("Arial", 12, "bold"),
-              command=verify).pack(pady=15)
-    login_window.mainloop()
+    tk.Button(
+        win, text="Login",
+        width=15, height=1,
+        bg=PRIMARY, fg="white",
+        font=("Arial", 12, "bold"),
+        command=verify
+    ).pack(pady=20)
 
 
 # ---------- ADMIN DASHBOARD ----------
-def admin_dashboard():
-    root = tk.Tk()
-    root.title("Admin Dashboard - EduTrack")
-    root.state("zoomed")
-    root.configure(bg="#f0f8ff")
+def admin_dashboard(parent):
+    dash = tk.Toplevel(parent)
+    dash.title("Admin Dashboard")
+    dash.state("zoomed")
+    dash.configure(bg=BG)
 
-    tk.Label(root, text="Admin Dashboard", font=("Arial", 24, "bold"), bg="#f0f8ff").pack(pady=20)
+    tk.Label(
+        dash, text="Admin Dashboard",
+        font=("Arial", 26, "bold"),
+        bg=BG
+    ).pack(pady=25)
 
-    frame = tk.Frame(root, bg="#f0f8ff")
-    frame.pack(pady=40)
+    frame = tk.Frame(dash, bg=BG)
+    frame.pack(pady=30)
 
-    buttons = [
-        ("Add Student", add_student_ui),
-        ("View Students", view_students_ui),
-        ("Weak Students", show_weak_students),
-        ("Logout", lambda: root.destroy())
-    ]
+    tk.Button(
+        frame, text="Add Student",
+        width=20, height=1,
+        bg=PRIMARY, fg="white",
+        font=("Arial", 14, "bold"),
+        command=lambda: add_student_ui(dash)
+    ).pack(pady=10)
 
-    for text, func in buttons:
-        tk.Button(frame, text=text, width=25, height=2, bg="#339966", fg="white",
-                  font=("Arial", 14, "bold"), command=func).pack(pady=15)
+    tk.Button(
+        frame, text="View Students",
+        width=20, height=1,
+        bg=PRIMARY, fg="white",
+        font=("Arial", 14, "bold"),
+        command=lambda: view_students_ui(dash)
+    ).pack(pady=10)
 
-    root.mainloop()
+    tk.Button(
+        frame, text="Performance Chart",
+        width=20, height=1,
+        bg=PRIMARY, fg="white",
+        font=("Arial", 14, "bold"),
+        command=show_subject_chart
+    ).pack(pady=10)
+
+    tk.Button(
+        frame, text="Result Summary",
+        width=20, height=1,
+        bg=PRIMARY, fg="white",
+        font=("Arial", 14, "bold"),
+        command=show_result_pie
+    ).pack(pady=10)
+
+    # 🔴 ONLY LOGOUT BUTTON RED
+    tk.Button(
+        frame, text="Logout",
+        width=15, height=1,
+        bg=LOGOUT, fg="white",
+        font=("Arial", 14, "bold"),
+        command=dash.destroy
+    ).pack(pady=30)
 
 
 # ---------- ADD STUDENT ----------
-def add_student_ui():
-    add_window = tk.Tk()
-    add_window.title("Add Student - EduTrack")
-    add_window.configure(bg="#f0f8ff")
-    add_window.resizable(False, False)
-    center_window(add_window, 500, 400)
+def add_student_ui(parent):
+    win = tk.Toplevel(parent)
+    win.title("Add Student")
+    win.geometry("420x420")
+    win.configure(bg=BG)
 
-    tk.Label(add_window, text="Add Student", font=("Arial", 18, "bold"), bg="#f0f8ff").pack(pady=20)
+    tk.Label(
+        win, text="Add Student",
+        font=("Arial", 18, "bold"),
+        bg=BG
+    ).pack(pady=20)
 
     entries = {}
     for field in ["Name", "Maths", "Science", "English"]:
-        tk.Label(add_window, text=field, bg="#f0f8ff").pack()
-        e = tk.Entry(add_window)
+        tk.Label(win, text=field, bg=BG).pack()
+        e = tk.Entry(win, width=30)
         e.pack(pady=5)
         entries[field] = e
 
     def save():
         try:
             name = entries["Name"].get()
-            marks = {subj: int(entries[subj].get()) for subj in ["Maths", "Science", "English"]}
+            marks = {s: int(entries[s].get()) for s in ["Maths", "Science", "English"]}
             logic.save_student(name, marks)
             messagebox.showinfo("Success", "Student Added Successfully")
-            add_window.destroy()
+            win.destroy()
         except:
-            messagebox.showerror("Error", "Invalid input")
+            messagebox.showerror("Error", "Invalid Input")
 
-    tk.Button(add_window, text="Save", width=20, height=2, bg="#339966", fg="white",
-              font=("Arial", 12, "bold"), command=save).pack(pady=15)
-    add_window.mainloop()
+    tk.Button(
+        win, text="Save",
+        width=18, height=1,
+        bg=SECONDARY, fg="white",
+        font=("Arial", 12, "bold"),
+        command=save
+    ).pack(pady=25)
 
 
 # ---------- VIEW STUDENTS ----------
-def view_students_ui():
-    view_window = tk.Tk()
-    view_window.title("All Students - EduTrack")
-    view_window.configure(bg="#f0f8ff")
-    view_window.resizable(False, False)
-    center_window(view_window, 700, 500)
-
-    tk.Label(view_window, text="All Students", font=("Arial", 18, "bold"), bg="#f0f8ff").pack(pady=20)
+def view_students_ui(parent):
+    win = tk.Toplevel(parent)
+    win.title("All Students")
+    win.geometry("750x500")
+    win.configure(bg=BG)
 
     cols = ("Name", "Maths", "Science", "English", "Average", "Grade")
-    table = ttk.Treeview(view_window, columns=cols, show="headings", height=15)
+    table = ttk.Treeview(win, columns=cols, show="headings", height=15)
+
     for col in cols:
         table.heading(col, text=col)
-        table.column(col, width=100)
-    table.pack(expand=True, fill="both")
+        table.column(col, width=120)
+
+    table.pack(expand=True, fill="both", padx=20, pady=20)
 
     students = logic.load_students()
     for s in students.values():
@@ -124,14 +170,32 @@ def view_students_ui():
             s.grade()
         ))
 
-    view_window.mainloop()
 
-
-# ---------- WEAK STUDENTS ----------
-def show_weak_students():
+# ---------- CHARTS ----------
+def show_subject_chart():
     students = logic.load_students()
-    weak = logic.weak_students(students)
-    if weak:
-        messagebox.showinfo("Weak Students", "\n".join(weak))
-    else:
-        messagebox.showinfo("Weak Students", "No weak students found")
+    subjects = ["Maths", "Science", "English"]
+    averages = [logic.subject_average(students, s) for s in subjects]
+
+    plt.figure()
+    plt.bar(subjects, averages)
+    plt.title("Subject-wise Average Marks")
+    plt.xlabel("Subjects")
+    plt.ylabel("Marks")
+    plt.show()
+
+
+def show_result_pie():
+    students = logic.load_students()
+    p, f = logic.result_summary(students)
+
+    plt.figure()
+    plt.pie(
+        [p, f],
+        labels=["Pass", "Fail"],
+        colors=["#4caf50", "#e53935"],  # green pass, red fail
+        autopct="%1.1f%%",
+        startangle=90
+    )
+    plt.title("Result Summary")
+    plt.show()
